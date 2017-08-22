@@ -12,3 +12,5 @@ deps/
 .idea/
 *.iml
 *.swp
+.classpath
+.settings
