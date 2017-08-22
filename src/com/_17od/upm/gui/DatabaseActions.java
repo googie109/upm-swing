@@ -39,6 +39,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.Timer;
 
+import com._17od.upm.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -54,11 +55,8 @@ import com._17od.upm.database.ProblemReadingDatabaseFile;
 import com._17od.upm.gui.MainWindow.ChangeDatabaseAction;
 import com._17od.upm.transport.Transport;
 import com._17od.upm.transport.TransportException;
-import com._17od.upm.util.FileChangedCallback;
-import com._17od.upm.util.FileMonitor;
-import com._17od.upm.util.Preferences;
-import com._17od.upm.util.Translator;
-import com._17od.upm.util.Util;
+import org.json.JSONObject;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 public class DatabaseActions {
@@ -1107,6 +1105,13 @@ public class DatabaseActions {
         }
         mainWindow.getStatusBar().setText(status);
         mainWindow.getStatusBar().setForeground(color);
+    }
+
+    public void centralizedStorage() {
+        /**
+         * TODO:: Add stuff for handling clicking on Centralized Storage MenuItem in the GUI
+         */
+        throw new NotImplementedException();
     }
 
 

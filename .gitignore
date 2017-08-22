@@ -9,3 +9,6 @@ coveragereport.dir/
 dist/
 nsis/upm-*.exe
 deps/
+.idea/
+*.iml
+*.swp

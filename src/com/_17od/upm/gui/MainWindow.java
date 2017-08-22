@@ -96,6 +96,7 @@ public class MainWindow extends JFrame implements ActionListener {
 	public static final String NEW_DATABASE_TXT = "newDatabaseMenuItem";
 	public static final String OPEN_DATABASE_TXT = "openDatabaseMenuItem";
 	public static final String OPEN_DATABASE_FROM_URL_TXT = "openDatabaseFromURLMenuItem";
+    public static final String CENTRALIZED_STORAGE_TXT = "centralizedDatabaseMenuItem";
 	public static final String SYNC_DATABASE_TXT = "syncWithRemoteDatabaseMenuItem";
 	public static final String CHANGE_MASTER_PASSWORD_TXT = "changeMasterPasswordMenuItem";
 	public static final String DATABASE_PROPERTIES_TXT = "databasePropertiesMenuItem";
@@ -130,6 +131,7 @@ public class MainWindow extends JFrame implements ActionListener {
 	private JMenuItem newDatabaseMenuItem;
 	private JMenuItem openDatabaseMenuItem;
 	private JMenuItem openDatabaseFromURLMenuItem;
+    private JMenuItem centralizedDatabaseMenuItem;
 	private JMenuItem syncWithRemoteDatabaseMenuItem;
 	private JMenuItem changeMasterPasswordMenuItem;
 	private JMenuItem databasePropertiesMenuItem;
@@ -653,6 +655,13 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		databaseMenu.addSeparator();
 
+        // testing new stuff
+        centralizedDatabaseMenuItem = new JMenuItem(Translator.translate(CENTRALIZED_STORAGE_TXT), KeyEvent.VK_C);
+        databaseMenu.add(centralizedDatabaseMenuItem);
+        centralizedDatabaseMenuItem.addActionListener(this);
+        centralizedDatabaseMenuItem.setActionCommand(CENTRALIZED_STORAGE_TXT);
+        // end new menu item
+
 		syncWithRemoteDatabaseMenuItem = new JMenuItem(Translator.translate(SYNC_DATABASE_TXT), KeyEvent.VK_S);
 		syncWithRemoteDatabaseMenuItem.setAccelerator(
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1050,7 +1059,9 @@ public class MainWindow extends JFrame implements ActionListener {
 			} else if (event.getActionCommand() == MainWindow.OPEN_DATABASE_FROM_URL_TXT) {
 				dbActions.openDatabaseFromURL();
 			} else if (event.getActionCommand() == MainWindow.SYNC_DATABASE_TXT) {
-				dbActions.syncWithRemoteDatabase();
+                dbActions.syncWithRemoteDatabase();
+            } else if (event.getActionCommand() == MainWindow.CENTRALIZED_STORAGE_TXT) {
+                dbActions.centralizedStorage();
 			} else if (event.getActionCommand() == MainWindow.ADD_ACCOUNT_TXT) {
 				dbActions.reloadDatabaseBefore(new AddAccountAction());
 			} else if (event.getActionCommand() == MainWindow.EDIT_ACCOUNT_TXT) {
