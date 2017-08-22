@@ -56,7 +56,7 @@ import com._17od.upm.gui.MainWindow.ChangeDatabaseAction;
 import com._17od.upm.transport.Transport;
 import com._17od.upm.transport.TransportException;
 import org.json.JSONObject;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import java.lang.UnsupportedOperationException;
 
 
 public class DatabaseActions {
@@ -1111,7 +1111,36 @@ public class DatabaseActions {
         /**
          * TODO:: Add stuff for handling clicking on Centralized Storage MenuItem in the GUI
          */
-        throw new NotImplementedException();
+    	/*
+    	 * 
+    	 * Lambda expression in java
+    	 * 
+    	 * OLD WAY:
+    	 * new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// do stuff
+			}
+    	});
+    	 * 
+    	 * New Way (Lambda Expression)
+    	 * new Thread(() -> { // do stuff });
+    	 * 
+    	 */
+    	Request.setGlobalDomain("http://localhost:8080/");
+    	
+    	Request.Get("pwd").sendAsync((err, res) -> {
+    		String response = "";
+    		try{
+    			response = res.getResponseString();
+    		}
+    		catch(IOException io)
+    		{
+    			io.printStackTrace();
+    		}
+    		System.out.println(response);
+    	});
+        //throw new UnsupportedOperationException();
     }
 
 
