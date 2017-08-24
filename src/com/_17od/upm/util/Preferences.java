@@ -66,7 +66,9 @@ public class Preferences {
     }
 
     public class DatabaseOptions {
-    }
+    	public static final String URL="url";
+    	public static final String USERNAME="username";
+     }
 
 
     private static final String PREF_FILE = System.getProperty("user.home") + System.getProperty("file.separator") + "upm.properties";

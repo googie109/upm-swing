@@ -22,6 +22,8 @@ package com._17od.upm.gui;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -33,13 +35,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import javax.swing.Timer;
 
-import com._17od.upm.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,8 +61,12 @@ import com._17od.upm.database.ProblemReadingDatabaseFile;
 import com._17od.upm.gui.MainWindow.ChangeDatabaseAction;
 import com._17od.upm.transport.Transport;
 import com._17od.upm.transport.TransportException;
-import org.json.JSONObject;
-import java.lang.UnsupportedOperationException;
+import com._17od.upm.util.FileChangedCallback;
+import com._17od.upm.util.FileMonitor;
+import com._17od.upm.util.Preferences;
+import com._17od.upm.util.Request;
+import com._17od.upm.util.Translator;
+import com._17od.upm.util.Util;
 
 
 public class DatabaseActions {
@@ -1106,27 +1116,74 @@ public class DatabaseActions {
         mainWindow.getStatusBar().setText(status);
         mainWindow.getStatusBar().setForeground(color);
     }
+    
+	public void addCentralizedStorage(){
+        /**
+         * TODO:: Add stuff for handling clicking on Add Centralized Storage MenuItem in the GUI
+         */
+		//save username && url to preferences
+		try {
+			Preferences.load();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+    	JDialog dialogBox = new JDialog(mainWindow, "Add Centralized Database");
+    	JPanel panel = new JPanel();
+    	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    	JLabel URL = new JLabel("URL");
+    	JLabel userName = new JLabel("UserName");
+    	JLabel password = new JLabel("Password");
+    	JTextField URLField = new JTextField(5);
+    	URLField.setMaximumSize(new Dimension(300, 25));
+    	URLField.setText(Preferences.get(Preferences.DatabaseOptions.URL, ""));
+    	JTextField userNameField = new JTextField(5);
+    	userNameField.setMaximumSize(new Dimension(300, 25));
+    	userNameField.setText(Preferences.get(Preferences.DatabaseOptions.USERNAME, ""));
+    	JTextField passwordField = new JTextField(5);
+    	passwordField.setMaximumSize(new Dimension(300, 25));
+    	JButton ok = new JButton("OK");
+    	
+    	
+    	ok.addActionListener((e) -> {
+    		//checks and validation here
+    		//invalid
+    		//	credentials
+    		//	url
+    		//validate function()
+    		//	errors to display
+    		Preferences.set(Preferences.DatabaseOptions.URL, URLField.getText());
+    		Preferences.set(Preferences.DatabaseOptions.USERNAME, userNameField.getText());
+    		try {
+				Preferences.save();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+    		
+    		dialogBox.dispose();
+		});
+    	
+    	//JButton cancel = new JButton("Cancel");
+    	
+    	dialogBox.setSize(170, 185);
+    	dialogBox.setLocationRelativeTo(null);
+    	dialogBox.add(panel);
+    	panel.add(URL);
+    	panel.add(URLField);
+    	panel.add(userName);
+    	panel.add(userNameField);
+    	panel.add(password);
+    	panel.add(passwordField);
+    	panel.add(ok);
+    	//panel.add(cancel);
+    	
+    	dialogBox.setVisible(true);
+    }
 
     public void centralizedStorage() {
         /**
          * TODO:: Add stuff for handling clicking on Centralized Storage MenuItem in the GUI
          */
-    	/*
-    	 * 
-    	 * Lambda expression in java
-    	 * 
-    	 * OLD WAY:
-    	 * new Thread(new Runnable() {
-			@Override
-			public void run() {
-				// do stuff
-			}
-    	});
-    	 * 
-    	 * New Way (Lambda Expression)
-    	 * new Thread(() -> { // do stuff });
-    	 * 
-    	 */
     	Request.setGlobalDomain("http://localhost:8080/");
     	
     	Request.Get("pwd").sendAsync((err, res) -> {
@@ -1141,6 +1198,10 @@ public class DatabaseActions {
     		System.out.println(response);
     	});
         //throw new UnsupportedOperationException();
+    }
+    
+    private void validate(){
+    	
     }
 
 

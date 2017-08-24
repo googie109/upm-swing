@@ -96,6 +96,8 @@ public class MainWindow extends JFrame implements ActionListener {
 	public static final String NEW_DATABASE_TXT = "newDatabaseMenuItem";
 	public static final String OPEN_DATABASE_TXT = "openDatabaseMenuItem";
 	public static final String OPEN_DATABASE_FROM_URL_TXT = "openDatabaseFromURLMenuItem";
+	//New
+	public static final String CENTRALIZED_ADD_TXT = "addCentralizedDatabaseMenuItem";
     public static final String CENTRALIZED_STORAGE_TXT = "centralizedDatabaseMenuItem";
 	public static final String SYNC_DATABASE_TXT = "syncWithRemoteDatabaseMenuItem";
 	public static final String CHANGE_MASTER_PASSWORD_TXT = "changeMasterPasswordMenuItem";
@@ -131,6 +133,10 @@ public class MainWindow extends JFrame implements ActionListener {
 	private JMenuItem newDatabaseMenuItem;
 	private JMenuItem openDatabaseMenuItem;
 	private JMenuItem openDatabaseFromURLMenuItem;
+	
+	//New JMenuItem
+	private JMenuItem addCentralizedDatabaseMenuItem;
+	
     private JMenuItem centralizedDatabaseMenuItem;
 	private JMenuItem syncWithRemoteDatabaseMenuItem;
 	private JMenuItem changeMasterPasswordMenuItem;
@@ -655,8 +661,19 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		databaseMenu.addSeparator();
 
+		//TODO: add centralized database here
+		//TODO: Find better hot key
+		addCentralizedDatabaseMenuItem = new JMenuItem(Translator.translate(CENTRALIZED_ADD_TXT), KeyEvent.VK_Z);
+		addCentralizedDatabaseMenuItem.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		databaseMenu.add(addCentralizedDatabaseMenuItem);
+		addCentralizedDatabaseMenuItem.addActionListener(this);
+		addCentralizedDatabaseMenuItem.setActionCommand(CENTRALIZED_ADD_TXT);
+		
         // testing new stuff
         centralizedDatabaseMenuItem = new JMenuItem(Translator.translate(CENTRALIZED_STORAGE_TXT), KeyEvent.VK_C);
+        centralizedDatabaseMenuItem.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         databaseMenu.add(centralizedDatabaseMenuItem);
         centralizedDatabaseMenuItem.addActionListener(this);
         centralizedDatabaseMenuItem.setActionCommand(CENTRALIZED_STORAGE_TXT);
@@ -1060,6 +1077,8 @@ public class MainWindow extends JFrame implements ActionListener {
 				dbActions.openDatabaseFromURL();
 			} else if (event.getActionCommand() == MainWindow.SYNC_DATABASE_TXT) {
                 dbActions.syncWithRemoteDatabase();
+            } else if(event.getActionCommand() == MainWindow.CENTRALIZED_ADD_TXT){
+            	dbActions.addCentralizedStorage();
             } else if (event.getActionCommand() == MainWindow.CENTRALIZED_STORAGE_TXT) {
                 dbActions.centralizedStorage();
 			} else if (event.getActionCommand() == MainWindow.ADD_ACCOUNT_TXT) {
