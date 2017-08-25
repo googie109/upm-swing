@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -67,6 +68,7 @@ import com._17od.upm.util.Preferences;
 import com._17od.upm.util.Request;
 import com._17od.upm.util.Translator;
 import com._17od.upm.util.Util;
+import org.bouncycastle.ocsp.Req;
 
 
 public class DatabaseActions {
@@ -377,6 +379,53 @@ public class DatabaseActions {
         openDatabase(databaseFilename, null);
     }
 
+    public void connectToCentralizedDatabase() {
+        // TODO:: load from Preferences
+        String url = "http://localhost:8080/pwd/secured";
+        String username = "admin";
+        String password = "123";
+        String credentials = getEncodedCredentials(username, password);
+
+
+        try {
+            Request.setGlobalDomain(url);
+            Request.Get("")
+                    .addRequestProperty("Authorization", "Basic " + credentials)
+                    .sendAsync((err, res) -> {
+                        String responseInfo = "";
+                        // problem with request
+                        if (err != null) {
+                            responseInfo += err.getMessage() + "\n";
+                        }
+                        if (res != null) {
+                            int responseCode = res.getCode();
+                            switch (responseCode) {
+                                case 401:
+                                    responseInfo += "Unauthorized! Invalid Credentials! \n";
+                                    break;
+                                case 404:
+                                    responseInfo += "Invalid Remote URL Location!\n";
+                                    break;
+                                default:
+                                    try {
+                                        responseInfo += res.getResponseString() + "\n";
+                                    } catch (IOException e) {
+                                        responseInfo += e.getMessage() + "\n";
+                                    }
+                            }
+                        }
+                        JOptionPane.showMessageDialog(null, responseInfo, "INFO", JOptionPane.INFORMATION_MESSAGE);
+            });
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private String getEncodedCredentials(String username, String password) {
+        String authStr = username + ":" + password;
+        String encodedCredentials = Base64.getEncoder().encodeToString((authStr).getBytes());
+        return encodedCredentials;
+    }
 
     public void openDatabase(String databaseFilename, char[] password) throws IOException, ProblemReadingDatabaseFile, CryptoException {
 

@@ -1080,7 +1080,8 @@ public class MainWindow extends JFrame implements ActionListener {
             } else if(event.getActionCommand() == MainWindow.CENTRALIZED_ADD_TXT){
             	dbActions.addCentralizedStorage();
             } else if (event.getActionCommand() == MainWindow.CENTRALIZED_STORAGE_TXT) {
-                dbActions.centralizedStorage();
+//                dbActions.centralizedStorage();
+                dbActions.connectToCentralizedDatabase();
 			} else if (event.getActionCommand() == MainWindow.ADD_ACCOUNT_TXT) {
 				dbActions.reloadDatabaseBefore(new AddAccountAction());
 			} else if (event.getActionCommand() == MainWindow.EDIT_ACCOUNT_TXT) {
