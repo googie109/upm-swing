@@ -1152,15 +1152,17 @@ public class DatabaseActions {
     		//	url
     		//validate function()
     		//	errors to display
-    		Preferences.set(Preferences.DatabaseOptions.URL, URLField.getText());
-    		Preferences.set(Preferences.DatabaseOptions.USERNAME, userNameField.getText());
-    		try {
-				Preferences.save();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+    		if(validate(URLField.getText(), userNameField.getText(), passwordField.getText(), dialogBox)){
+	    		Preferences.set(Preferences.DatabaseOptions.URL, URLField.getText());
+	    		Preferences.set(Preferences.DatabaseOptions.USERNAME, userNameField.getText());
+	    		try {
+					Preferences.save();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+	    		dialogBox.dispose();
+    		}
     		
-    		dialogBox.dispose();
 		});
     	
     	//JButton cancel = new JButton("Cancel");
@@ -1200,8 +1202,25 @@ public class DatabaseActions {
         //throw new UnsupportedOperationException();
     }
     
-    private void validate(){
+    private boolean validate(String url, String userName, String password, JDialog dialogBox){
+    	boolean isValid = false;
+    	if(!url.isEmpty() && !userName.isEmpty() && !password.isEmpty()){
+    		Request.setGlobalDomain("http://localhost:8080/");
+    		Request.Get("pwd").sendAsync((err, res) -> {
+    			if(err != null){
+    	        	JOptionPane.showMessageDialog(dialogBox, err.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+    			}
+    			else{
+    	        	JOptionPane.showMessageDialog(dialogBox, "Database Added.", "Success", JOptionPane.INFORMATION_MESSAGE);
+    			}
+    		});
+    		isValid = true;
+    	}
+    	else{
+        	JOptionPane.showMessageDialog(dialogBox, "Please fill out all fields", "Error", JOptionPane.WARNING_MESSAGE);
+    	}
     	
+    	return isValid;
     }
 
 
