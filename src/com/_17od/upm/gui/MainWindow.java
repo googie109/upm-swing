@@ -661,8 +661,6 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		databaseMenu.addSeparator();
 
-		//TODO: add centralized database here
-		//TODO: Find better hot key
 		addCentralizedDatabaseMenuItem = new JMenuItem(Translator.translate(CENTRALIZED_ADD_TXT), KeyEvent.VK_Z);
 		addCentralizedDatabaseMenuItem.setAccelerator(
 				KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));

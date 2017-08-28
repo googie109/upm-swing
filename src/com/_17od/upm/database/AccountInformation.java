@@ -24,6 +24,12 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import org.json.JSONObject;
+
+import com._17od.upm.crypto.CryptoException;
+import com._17od.upm.crypto.EncryptionService;
 
 
 public class AccountInformation extends FlatPackObject {
@@ -33,6 +39,7 @@ public class AccountInformation extends FlatPackObject {
     private String password;
     private String url;
     private String notes;
+    private JSONObject jsonInfo;
 
 
     public AccountInformation() {

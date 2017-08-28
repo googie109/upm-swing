@@ -56,6 +56,7 @@ import com._17od.upm.database.AccountInformation;
 import com._17od.upm.database.AccountsCSVMarshaller;
 import com._17od.upm.database.ExportException;
 import com._17od.upm.database.ImportException;
+import com._17od.upm.database.JSONDatabaseSerializer;
 import com._17od.upm.database.PasswordDatabase;
 import com._17od.upm.database.PasswordDatabasePersistence;
 import com._17od.upm.database.ProblemReadingDatabaseFile;
@@ -69,6 +70,7 @@ import com._17od.upm.util.Request;
 import com._17od.upm.util.Translator;
 import com._17od.upm.util.Util;
 import org.bouncycastle.ocsp.Req;
+import org.json.JSONObject;
 
 
 public class DatabaseActions {
@@ -380,17 +382,24 @@ public class DatabaseActions {
     }
 
     public void connectToCentralizedDatabase() {
+		try {
+			Preferences.load();
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+    	
         // TODO:: load from Preferences
-        String url = "http://localhost:8080/pwd/secured";
-        String username = "admin";
-        String password = "123";
+        String url = Preferences.get(Preferences.DatabaseOptions.URL, "");
+        String username = Preferences.get(Preferences.DatabaseOptions.USERNAME, "");
+        String password = JOptionPane.showInputDialog("Enter your Password");
         String credentials = getEncodedCredentials(username, password);
 
 
         try {
-            Request.setGlobalDomain(url);
+            Request.setGlobalDomain("http://localhost:8080/pwd/test");
             Request.Get("")
                     .addRequestProperty("Authorization", "Basic " + credentials)
+                    .setData(credentials)
                     .sendAsync((err, res) -> {
                         String responseInfo = "";
                         // problem with request
@@ -429,6 +438,7 @@ public class DatabaseActions {
 
     public void openDatabase(String databaseFilename, char[] password) throws IOException, ProblemReadingDatabaseFile, CryptoException {
 
+    	
         boolean passwordCorrect = false;
         boolean okClicked = true;
         while (!passwordCorrect && okClicked) {
@@ -504,7 +514,7 @@ public class DatabaseActions {
 
 
     public void addAccount() throws IOException, CryptoException, TransportException, ProblemReadingDatabaseFile, PasswordDatabaseException {
-
+    	//TODO: bookmark
         if (getLatestVersionOfDatabase()) {
 
             //Initialise the AccountDialog
@@ -512,7 +522,7 @@ public class DatabaseActions {
             AccountDialog accDialog = new AccountDialog(accInfo, mainWindow, false, accountNames);
             accDialog.pack();
             accDialog.setLocationRelativeTo(mainWindow);
-            accDialog.show();
+            accDialog.setVisible(true);
 
             //If the user press OK then save the new account to the database
             if (accDialog.okClicked()) {
@@ -566,7 +576,7 @@ public class DatabaseActions {
         AccountDialog accDialog = new AccountDialog(accInfo, mainWindow, true, accountNames);
         accDialog.pack();
         accDialog.setLocationRelativeTo(mainWindow);
-        accDialog.show();
+        accDialog.setVisible(true);
     }
 
 
@@ -735,7 +745,7 @@ public class DatabaseActions {
         OpenDatabaseFromURLDialog openDBDialog = new OpenDatabaseFromURLDialog(mainWindow);
         openDBDialog.pack();
         openDBDialog.setLocationRelativeTo(mainWindow);
-        openDBDialog.show();
+        openDBDialog.setVisible(true);
 
         if (openDBDialog.getOkClicked()) {
             // Get the remote database options
@@ -1112,9 +1122,33 @@ public class DatabaseActions {
         return selectedFile;
     }
 
-
     private void saveDatabase() throws IOException, CryptoException {
         dbPers.save(database);
+
+        if(hasRemoteCentralizedDatabase()){
+        	//TODO: request handle passing the user's password into our authentication request!!!
+        	//TODO handle error response codes
+        	JSONObject accountData = JSONDatabaseSerializer.compileJSON(Preferences.get("username"),"123");
+        	String str = accountData.toString();
+        	Request.setGlobalDomain("http://localhost:8080/");
+        	Request.Post("addAccounts").setData(str).sendAsync((err, res) ->{
+        		if(err != null){
+        			System.out.println("WOW!!!");
+        		}else{
+        			if (res.getCode() == 200) {
+        				System.out.println("OK!");
+        				try {
+							String responseStr = res.getResponseString();
+							System.out.println("response received = " + responseStr);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+        			}
+        		}
+        	});
+        }
+        
         if (fileMonitor != null) {
             fileMonitor.start();
         }
@@ -1143,6 +1177,12 @@ public class DatabaseActions {
         }
 
         setStatusBarText();
+    }
+    
+    private boolean hasRemoteCentralizedDatabase(){
+    	
+    	
+    	return true;
     }
 
 
@@ -1196,11 +1236,6 @@ public class DatabaseActions {
     	
     	ok.addActionListener((e) -> {
     		//checks and validation here
-    		//invalid
-    		//	credentials
-    		//	url
-    		//validate function()
-    		//	errors to display
     		if(validate(URLField.getText(), userNameField.getText(), passwordField.getText(), dialogBox)){
 	    		Preferences.set(Preferences.DatabaseOptions.URL, URLField.getText());
 	    		Preferences.set(Preferences.DatabaseOptions.USERNAME, userNameField.getText());
@@ -1254,8 +1289,14 @@ public class DatabaseActions {
     private boolean validate(String url, String userName, String password, JDialog dialogBox){
     	boolean isValid = false;
     	if(!url.isEmpty() && !userName.isEmpty() && !password.isEmpty()){
-    		Request.setGlobalDomain("http://localhost:8080/");
-    		Request.Get("pwd").sendAsync((err, res) -> {
+    		JSONObject userInfo = new JSONObject();
+    		userInfo.put("username", userName);
+    		userInfo.put("password", password);
+    		
+    		Request.setGlobalDomain(url);
+    		Request req = Request.Post("");
+    		req.setData(userInfo.toString());
+    		req.sendAsync((err, res) -> {
     			if(err != null){
     	        	JOptionPane.showMessageDialog(dialogBox, err.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
     			}

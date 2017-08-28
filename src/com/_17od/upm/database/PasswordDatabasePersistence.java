@@ -33,6 +33,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.json.JSONObject;
+
 import com._17od.upm.crypto.CryptoException;
 import com._17od.upm.crypto.DESDecryptionService;
 import com._17od.upm.crypto.EncryptionService;
@@ -301,6 +303,7 @@ public class PasswordDatabasePersistence {
     }
 
     public void save(PasswordDatabase database) throws IOException, CryptoException {
+    	JSONDatabaseSerializer.clear();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
         // Flatpack the database revision and options
@@ -312,9 +315,10 @@ public class PasswordDatabasePersistence {
         Iterator it = database.getAccountsHash().values().iterator();
         while (it.hasNext()) {
             AccountInformation ai = (AccountInformation) it.next();
+            JSONDatabaseSerializer.addAccountInformation(ai);
             ai.flatPack(os);
         }
-        os.close();
+        os.close();//TODO: before this line
         byte[] dataToEncrypt = os.toByteArray();
 
         //Now encrypt the database data
