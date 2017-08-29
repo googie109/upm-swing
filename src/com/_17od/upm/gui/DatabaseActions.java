@@ -491,9 +491,10 @@ public class DatabaseActions {
 
     //TODO: change
     public void openServerDatabase(String databaseFilename, char[] password) throws IOException, ProblemReadingDatabaseFile, CryptoException {
+        int response = -1;
         boolean passwordCorrect = false;
-        boolean okClicked = true;
-        while (!passwordCorrect && okClicked) {
+    	boolean okClicked = true;
+        while (response != 200 && okClicked) {
             // If we weren't given a password then ask the user to enter one
             if (password == null) {
                 password = askUserForServerPassword(Translator.translate("enterServerDatabasePassword"));
@@ -505,19 +506,14 @@ public class DatabaseActions {
             }
 
             if (okClicked) {
-//                try {
-                    //dbPers = new PasswordDatabasePersistence();
-                    //database = dbPers.load(new File(databaseFilename), password);
-//                    passwordCorrect = true;
-//                } catch (InvalidPasswordException e) {
-//                    JOptionPane.showMessageDialog(mainWindow, Translator.translate("incorrectPassword"));
-//                    password = null;
-//                }
+            	//TODO: check password
+            	
             }
         }
-
-        if (passwordCorrect) {
-            //doOpenDatabaseActions();
+        
+        if(passwordCorrect){
+        	//TODO: load database
+        	
         }
     }
 
