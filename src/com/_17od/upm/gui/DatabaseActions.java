@@ -1350,7 +1350,27 @@ public class DatabaseActions {
     	        	JOptionPane.showMessageDialog(dialogBox, err.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
     			}
     			else{
-    	        	JOptionPane.showMessageDialog(dialogBox, "Database Added.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    int code = res.getCode();
+                    String resText = "";
+                    try {
+                        resText = res.getResponseString();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    switch (code) {
+                        case 200:
+                            JOptionPane.showMessageDialog(dialogBox, "Centralized Database Added!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            break;
+                        case 404:
+                            JOptionPane.showMessageDialog(dialogBox, "Server Says: " + resText, "Error", JOptionPane.ERROR_MESSAGE);
+                            break;
+                        case 409:
+                            JOptionPane.showMessageDialog(dialogBox, "Server Says: " + resText, "Error", JOptionPane.ERROR_MESSAGE);
+                            break;
+                        // something else happened that we don't know
+                        default:
+                            JOptionPane.showMessageDialog(dialogBox, "Unhandled Response! Server Says: " + resText + " with code: " + res.getCode());
+                    }
     			}
     		});
     		isValid = true;
