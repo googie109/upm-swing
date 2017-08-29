@@ -367,7 +367,7 @@ public class DatabaseActions {
                 masterPassword.requestFocusInWindow();
             }
         });
-        dialog.show();
+        dialog.setVisible(true);
 
         if (pane.getValue() != null && pane.getValue().equals(new Integer(JOptionPane.OK_OPTION))) {
             password = masterPassword.getPassword();
@@ -376,6 +376,29 @@ public class DatabaseActions {
         return password;
     }
 
+    /**
+     * Prompt the user to enter a password
+     * @return The password entered by the user or null of this hit escape/cancel
+     */
+    private char[] askUserForServerPassword(String message) {
+        char[] password = null;
+
+        final JPasswordField masterPassword = new JPasswordField("");
+        JOptionPane pane = new JOptionPane(new Object[] {message, masterPassword }, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+        JDialog dialog = pane.createDialog(mainWindow, Translator.translate("masterPassword"));
+        dialog.addWindowFocusListener(new WindowAdapter() {
+            public void windowGainedFocus(WindowEvent e) {
+                masterPassword.requestFocusInWindow();
+            }
+        });
+        dialog.setVisible(true);
+
+        if (pane.getValue() != null && pane.getValue().equals(new Integer(JOptionPane.OK_OPTION))) {
+            password = masterPassword.getPassword();
+        }
+
+        return password;
+    }
 
     public void openDatabase(String databaseFilename) throws IOException, ProblemReadingDatabaseFile, CryptoException {
         openDatabase(databaseFilename, null);
@@ -388,13 +411,11 @@ public class DatabaseActions {
 			e2.printStackTrace();
 		}
     	
-        // TODO:: load from Preferences
         String url = Preferences.get(Preferences.DatabaseOptions.URL, "");
         String username = Preferences.get(Preferences.DatabaseOptions.USERNAME, "");
         String password = JOptionPane.showInputDialog("Enter your Password");
         String credentials = getEncodedCredentials(username, password);
-
-
+        
         try {
             Request.setGlobalDomain("http://localhost:8080/pwd/test");
             Request.Get("")
@@ -437,7 +458,6 @@ public class DatabaseActions {
     }
 
     public void openDatabase(String databaseFilename, char[] password) throws IOException, ProblemReadingDatabaseFile, CryptoException {
-
     	
         boolean passwordCorrect = false;
         boolean okClicked = true;
@@ -467,9 +487,39 @@ public class DatabaseActions {
         if (passwordCorrect) {
             doOpenDatabaseActions();
         }
-
     }
 
+    //TODO: change
+    public void openServerDatabase(String databaseFilename, char[] password) throws IOException, ProblemReadingDatabaseFile, CryptoException {
+        boolean passwordCorrect = false;
+        boolean okClicked = true;
+        while (!passwordCorrect && okClicked) {
+            // If we weren't given a password then ask the user to enter one
+            if (password == null) {
+                password = askUserForServerPassword(Translator.translate("enterServerDatabasePassword"));
+                if (password == null) {
+                    okClicked = false;
+                }
+            } else {
+                okClicked = true;
+            }
+
+            if (okClicked) {
+//                try {
+                    //dbPers = new PasswordDatabasePersistence();
+                    //database = dbPers.load(new File(databaseFilename), password);
+//                    passwordCorrect = true;
+//                } catch (InvalidPasswordException e) {
+//                    JOptionPane.showMessageDialog(mainWindow, Translator.translate("incorrectPassword"));
+//                    password = null;
+//                }
+            }
+        }
+
+        if (passwordCorrect) {
+            //doOpenDatabaseActions();
+        }
+    }
 
     public void openDatabase() throws IOException, ProblemReadingDatabaseFile, CryptoException {
         JFileChooser fc = new JFileChooser();
@@ -514,7 +564,6 @@ public class DatabaseActions {
 
 
     public void addAccount() throws IOException, CryptoException, TransportException, ProblemReadingDatabaseFile, PasswordDatabaseException {
-    	//TODO: bookmark
         if (getLatestVersionOfDatabase()) {
 
             //Initialise the AccountDialog

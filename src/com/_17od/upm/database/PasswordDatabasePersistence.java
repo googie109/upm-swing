@@ -318,7 +318,7 @@ public class PasswordDatabasePersistence {
             JSONDatabaseSerializer.addAccountInformation(ai);
             ai.flatPack(os);
         }
-        os.close();//TODO: before this line
+        os.close();
         byte[] dataToEncrypt = os.toByteArray();
 
         //Now encrypt the database data
