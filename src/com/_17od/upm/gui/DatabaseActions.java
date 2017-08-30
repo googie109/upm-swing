@@ -1328,47 +1328,13 @@ public class DatabaseActions {
     		}
     		System.out.println(response);
     	});
-        //throw new UnsupportedOperationException();
     }
     
-    private boolean validate(String url, String userName, String password, JDialog dialogBox){
+    private boolean validate(String url, String username, String password, JDialog dialogBox){
     	boolean isValid = false;
-    	if(!url.isEmpty() && !userName.isEmpty() && !password.isEmpty()){
-    		JSONObject userInfo = new JSONObject();
-    		userInfo.put("username", userName);
-    		userInfo.put("password", password);
+    	if(!url.isEmpty() && !username.isEmpty() && !password.isEmpty()){
+    		serverRequest(url, username, password, dialogBox);
     		
-    		Request.setGlobalDomain(url);
-    		Request req = Request.Post("");
-    		req.setData(userInfo.toString());
-    		req.sendAsync((err, res) -> {
-    			if(err != null){
-    	        	JOptionPane.showMessageDialog(dialogBox, err.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
-    			}
-    			else{
-                    int code = res.getCode();
-                    String resText = "";
-                    try {
-                        resText = res.getResponseString();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    switch (code) {
-                        case 200:
-                            JOptionPane.showMessageDialog(dialogBox, "Centralized Database Added!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                            break;
-                        case 404:
-                            JOptionPane.showMessageDialog(dialogBox, "Server Says: " + resText, "Error", JOptionPane.ERROR_MESSAGE);
-                            break;
-                        case 409:
-                            JOptionPane.showMessageDialog(dialogBox, "Server Says: " + resText, "Error", JOptionPane.ERROR_MESSAGE);
-                            break;
-                        // something else happened that we don't know
-                        default:
-                            JOptionPane.showMessageDialog(dialogBox, "Unhandled Response! Server Says: " + resText + " with code: " + res.getCode());
-                    }
-    			}
-    		});
     		isValid = true;
     	}
     	else{
@@ -1376,6 +1342,44 @@ public class DatabaseActions {
     	}
     	
     	return isValid;
+    }
+    
+    private void serverRequest(String url, String username, String password, JDialog dialogBox){
+    	JSONObject userInfo = new JSONObject();
+		userInfo.put("username", username);
+		userInfo.put("password", password);
+		
+    	Request.setGlobalDomain(url);
+		Request req = Request.Post("register");
+		req.setData(userInfo.toString());
+		req.sendAsync((err, res) -> {
+			if(err != null){
+	        	JOptionPane.showMessageDialog(dialogBox, err.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+			}
+			else{
+                int code = res.getCode();
+                String resText = "";
+                try {
+                    resText = res.getResponseString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                switch (code) {
+                    case 200:
+                        JOptionPane.showMessageDialog(dialogBox, "Centralized Database Added!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        break;
+                    case 404:
+                        JOptionPane.showMessageDialog(dialogBox, "Server Says: " + resText, "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case 409:
+                        JOptionPane.showMessageDialog(dialogBox, "Server Says: " + resText, "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    // something else happened that we don't know
+                    default:
+                        JOptionPane.showMessageDialog(dialogBox, "Unhandled Response! Server Says: " + resText + " with code: " + res.getCode());
+                }
+			}
+		});
     }
 
 
