@@ -558,6 +558,46 @@ public class DatabaseActions {
 
     }
 
+    public void restoreFromCentralizedDatabase() {
+        String url = Preferences.get(Preferences.DatabaseOptions.URL, "");
+        String username = Preferences.get(Preferences.DatabaseOptions.USERNAME, "");
+        String password = JOptionPane.showInputDialog(mainWindow, "Enter your password to the centralized database");
+
+        JSONObject data = new JSONObject();
+        data.put("username", username);
+        data.put("password", password);
+
+        if (validate(url, username, password, null)) {
+            Request.setGlobalDomain(url);
+            Request.Post("getAccounts").setData(data.toString()).sendAsync((err, res) -> {
+                if (err != null) {
+                    JOptionPane.showMessageDialog(null, "ERROR: " + err.getMessage());
+                }
+                if (res.getCode() == 200) {
+                    try {
+                        String responseStr = res.getResponseString();
+                        JSONObject responseData = new JSONObject(responseStr);
+                        // all of the users accounts
+                        AccountInformation[] accountInfo = JSONDatabaseSerializer.deserialize(responseData);
+                        newDatabase();
+                        for (int j = 0; j < accountInfo.length; ++j) {
+                            AccountInformation info = accountInfo[j];
+                            database.addAccount(info);
+                            accountNames.add(info.getAccountName());
+                        }
+                        saveDatabase();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (CryptoException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "An error occurred");
+                }
+            });
+        }
+    }
+
 
     public void addAccount() throws IOException, CryptoException, TransportException, ProblemReadingDatabaseFile, PasswordDatabaseException {
         if (getLatestVersionOfDatabase()) {

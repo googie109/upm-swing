@@ -100,6 +100,7 @@ public class MainWindow extends JFrame implements ActionListener {
 	public static final String CENTRALIZED_ADD_TXT = "addCentralizedDatabaseMenuItem";
     public static final String CENTRALIZED_STORAGE_TXT = "centralizedDatabaseMenuItem";
 	public static final String SYNC_DATABASE_TXT = "syncWithRemoteDatabaseMenuItem";
+    public static final String RESTORE_CENTRALIZED_TXT = "restoreCentralizedMenuItem";
 	public static final String CHANGE_MASTER_PASSWORD_TXT = "changeMasterPasswordMenuItem";
 	public static final String DATABASE_PROPERTIES_TXT = "databasePropertiesMenuItem";
 	public static final String ADD_ACCOUNT_TXT = "addAccountMenuItem";
@@ -136,6 +137,7 @@ public class MainWindow extends JFrame implements ActionListener {
 	
 	//New JMenuItem
 	private JMenuItem addCentralizedDatabaseMenuItem;
+    private JMenuItem restoreCentralizedMenuItem;
 	
     private JMenuItem centralizedDatabaseMenuItem;
 	private JMenuItem syncWithRemoteDatabaseMenuItem;
@@ -668,14 +670,20 @@ public class MainWindow extends JFrame implements ActionListener {
 		addCentralizedDatabaseMenuItem.addActionListener(this);
 		addCentralizedDatabaseMenuItem.setActionCommand(CENTRALIZED_ADD_TXT);
 		
-        // testing new stuff
         centralizedDatabaseMenuItem = new JMenuItem(Translator.translate(CENTRALIZED_STORAGE_TXT), KeyEvent.VK_C);
         centralizedDatabaseMenuItem.setAccelerator(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         databaseMenu.add(centralizedDatabaseMenuItem);
         centralizedDatabaseMenuItem.addActionListener(this);
         centralizedDatabaseMenuItem.setActionCommand(CENTRALIZED_STORAGE_TXT);
-        // end new menu item
+
+        restoreCentralizedMenuItem = new JMenuItem(Translator.translate(RESTORE_CENTRALIZED_TXT), KeyEvent.VK_R);
+        restoreCentralizedMenuItem.setAccelerator(
+                KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
+        databaseMenu.add(restoreCentralizedMenuItem);
+        restoreCentralizedMenuItem.addActionListener(this);
+        restoreCentralizedMenuItem.setActionCommand(RESTORE_CENTRALIZED_TXT);
 
 		syncWithRemoteDatabaseMenuItem = new JMenuItem(Translator.translate(SYNC_DATABASE_TXT), KeyEvent.VK_S);
 		syncWithRemoteDatabaseMenuItem.setAccelerator(
@@ -1080,6 +1088,8 @@ public class MainWindow extends JFrame implements ActionListener {
             } else if (event.getActionCommand() == MainWindow.CENTRALIZED_STORAGE_TXT) {
 //                dbActions.centralizedStorage();
                 dbActions.connectToCentralizedDatabase();
+            } else if (event.getActionCommand() == MainWindow.RESTORE_CENTRALIZED_TXT) {
+                dbActions.restoreFromCentralizedDatabase();
 			} else if (event.getActionCommand() == MainWindow.ADD_ACCOUNT_TXT) {
 				dbActions.reloadDatabaseBefore(new AddAccountAction());
 			} else if (event.getActionCommand() == MainWindow.EDIT_ACCOUNT_TXT) {
