@@ -1,5 +1,6 @@
 package com._17od.upm.database;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -55,18 +56,20 @@ public class JSONDatabaseSerializer {
 		for(int x = 0; x < jArr.length(); x++){
             JSONObject obj = (JSONObject) jArr.get(x);
             AccountInformation accountInfo = new AccountInformation();
-			accountInfo.setAccountName(obj.optString("name", ""));
+			accountInfo.setAccountName(obj.optString("account", ""));
 			accountInfo.setUserId(obj.optString("userId", ""));
 			try {
                 EncryptionService encrypt = new EncryptionService("123".toCharArray());
                 String encryptedPassword = obj.optString("password", "");
                 byte[] pBytes = getActualBytes(encryptedPassword);
 				byte[] pass = encrypt.decrypt(pBytes);
-				accountInfo.setPassword(Arrays.toString(pass));
+				accountInfo.setPassword(new String(pass, "UTF-8"));
 			} catch (CryptoException e) {
 				e.printStackTrace();
-			}
-			accountInfo.setUrl(obj.optString("url", ""));
+			} catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            accountInfo.setUrl(obj.optString("url", ""));
 			accountInfo.setNotes(obj.optString("notes", ""));
             ais[x] = accountInfo;
 		}

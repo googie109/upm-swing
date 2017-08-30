@@ -21,13 +21,13 @@
 package com._17od.upm.crypto;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.Arrays;
+import org.junit.Assert;
+
 
 import com._17od.upm.database.JSONDatabaseSerializer;
 import com._17od.upm.util.Request;
 import junit.framework.TestCase;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 
@@ -66,8 +66,20 @@ public class TestEncryptionService extends TestCase {
             Request.Response res = req.getResponse();
             try {
                 String response = res.getResponseString();
-                JSONObject receivedObj = new JSONObject(response);
-                assertEquals(passwordObj.get("password"), receivedObj.get("password"));
+                String jsonStr = response.replaceAll("\"", "").replaceAll("\\\\", "");
+                JSONObject receivedObj = new JSONObject(jsonStr);
+
+                byte[] originalBytes = JSONDatabaseSerializer.getActualBytes(passwordObj.optString("password"));
+                byte[] receivedBytes = JSONDatabaseSerializer.getActualBytes(receivedObj.optString("password"));
+
+                byte[] originalDecryptedBytes = encryptionService.decrypt(originalBytes);
+                byte[] receivedDecryptedBytes = encryptionService.decrypt(receivedBytes);
+
+                Assert.assertArrayEquals(originalBytes, receivedBytes);
+                assertEquals("Decrypted Text is not the same!", Arrays.toString(receivedDecryptedBytes), Arrays.toString(originalDecryptedBytes));
+
+                String result = new String(receivedDecryptedBytes, "UTF-8");
+                System.out.println("result = " + result);
             } catch (Exception e) {
                 e.printStackTrace();
                 fail();

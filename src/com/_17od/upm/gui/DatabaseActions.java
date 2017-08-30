@@ -583,10 +583,12 @@ public class DatabaseActions {
                         newDatabase();
                         for (int j = 0; j < accountInfo.length; ++j) {
                             AccountInformation info = accountInfo[j];
+                            database.deleteAccount(info.getAccountName());
                             database.addAccount(info);
+                            saveDatabase();
                             accountNames.add(info.getAccountName());
+                            filter();
                         }
-                        saveDatabase();
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (CryptoException e) {
