@@ -15,7 +15,7 @@ import java.net.URL;
  */
 
 public class Request {
-    private static String DOMAIN = "http://localhost:4040/test";
+    private static String DOMAIN = "";
 
     /*
      * Default Timeout values
