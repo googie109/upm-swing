@@ -1277,11 +1277,11 @@ public class DatabaseActions {
     	JTextField passwordField = new JTextField(5);
     	passwordField.setMaximumSize(new Dimension(300, 25));
     	JButton ok = new JButton("OK");
-    	
-    	
+
     	ok.addActionListener((e) -> {
     		//checks and validation here
     		if(validate(URLField.getText(), userNameField.getText(), passwordField.getText(), dialogBox)){
+        		serverRequest(URLField.getText(), userNameField.getText(), passwordField.getText(),  dialogBox);
 	    		Preferences.set(Preferences.DatabaseOptions.URL, URLField.getText());
 	    		Preferences.set(Preferences.DatabaseOptions.USERNAME, userNameField.getText());
 	    		try {
@@ -1333,7 +1333,6 @@ public class DatabaseActions {
     private boolean validate(String url, String username, String password, JDialog dialogBox){
     	boolean isValid = false;
     	if(!url.isEmpty() && !username.isEmpty() && !password.isEmpty()){
-    		serverRequest(url, username, password, dialogBox);
     		
     		isValid = true;
     	}

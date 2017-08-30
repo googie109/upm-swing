@@ -1,6 +1,8 @@
 package com._17od.upm.database;
 
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,5 +48,25 @@ public class JSONDatabaseSerializer {
 		return data;
 	}
 	
+	public AccountInformation[] deserialize(JSONObject obj){
+		JSONObject[] jArr = (JSONObject[])obj.get("userAccounts");
+		AccountInformation[] ais = new AccountInformation[jArr.length];
+		for(int x = 0; x < jArr.length; x++){
+			ais[x].setAccountName(jArr[x].getString("accountName"));
+			ais[x].setUserId(jArr[x].getString("accountID"));
+			try {
+				EncryptionService encrypt = new EncryptionService(jArr[x].getString("accountPassword").toCharArray());
+				byte[] pBytes = jArr[x].getString("accountPassword").getBytes(StandardCharsets.UTF_8);
+				byte[] pass = encrypt.decrypt(pBytes);
+				ais[x].setPassword(Arrays.toString(pass));
+			} catch (CryptoException e) {
+				e.printStackTrace();
+			}
+			ais[x].setUrl(jArr[x].getString("accountURL"));
+			ais[x].setNotes(jArr[x].getString("accountNotes"));
+		}
+		
+		return ais;
+	}
 	
 }
