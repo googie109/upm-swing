@@ -70,6 +70,7 @@ import com._17od.upm.util.Request;
 import com._17od.upm.util.Translator;
 import com._17od.upm.util.Util;
 import org.bouncycastle.ocsp.Req;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 
@@ -576,7 +577,7 @@ public class DatabaseActions {
                 if (res.getCode() == 200) {
                     try {
                         String responseStr = res.getResponseString();
-                        JSONObject responseData = new JSONObject(responseStr);
+                        JSONArray responseData = new JSONArray(responseStr);
                         // all of the users accounts
                         AccountInformation[] accountInfo = JSONDatabaseSerializer.deserialize(responseData);
                         newDatabase();
@@ -1215,7 +1216,8 @@ public class DatabaseActions {
         	//TODO handle error response codes
         	JSONObject accountData = JSONDatabaseSerializer.compileJSON(Preferences.get("username"),"123");
         	String str = accountData.toString();
-        	Request.setGlobalDomain("http://localhost:8080/");
+            String url = Preferences.get(Preferences.DatabaseOptions.URL);
+        	Request.setGlobalDomain(url);
         	Request.Post("addAccounts").setData(str).sendAsync((err, res) ->{
         		if(err != null){
         			System.out.println("WOW!!!");

@@ -20,8 +20,15 @@
  */
 package com._17od.upm.crypto;
 
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.Arrays;
+
+import com._17od.upm.database.JSONDatabaseSerializer;
+import com._17od.upm.util.Request;
 import junit.framework.TestCase;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 public class TestEncryptionService extends TestCase {
@@ -35,7 +42,42 @@ public class TestEncryptionService extends TestCase {
         assertEquals("Decrypted text is different to original cleartext", new String(cleartext), new String(cleartext2));
     }
 
-    
+    // Testing converting byte array from a JSON string
+    public void testJSONEncryption() throws CryptoException {
+        JSONObject passwordObj = new JSONObject();
+        char[] password = "123".toCharArray();
+        EncryptionService encryptionService = new EncryptionService(password);
+
+        // dummy user account
+        byte[] accountPassword = "abcdefghijklmnopqrstuvwxyz12345".getBytes();
+        byte[] encryptedBytes = encryptionService.encrypt(accountPassword);
+        String foo = Arrays.toString(encryptedBytes);
+        passwordObj.put("password", foo);
+
+        byte[] test = JSONDatabaseSerializer.getActualBytes(passwordObj.optString("password", ""));
+        byte[] decryptedText = encryptionService.decrypt(test);
+        assertEquals("Decrypted text is not the same!", Arrays.toString(accountPassword), Arrays.toString(decryptedText));
+
+        // ensure posting and receiving from server is same
+        try {
+            Request.setGlobalDomain("http://10.10.16.96:8080/");
+            Request req = Request.Post("testPost").setData(passwordObj.toString());
+            req.send();
+            Request.Response res = req.getResponse();
+            try {
+                String response = res.getResponseString();
+                JSONObject receivedObj = new JSONObject(response);
+                assertEquals(passwordObj.get("password"), receivedObj.get("password"));
+            } catch (Exception e) {
+                e.printStackTrace();
+                fail();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
     public void testChangePassword() throws CryptoException {
 
         char[] password = "test password".toCharArray();

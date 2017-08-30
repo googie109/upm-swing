@@ -29,10 +29,11 @@ public class JSONDatabaseSerializer {
 		accountInfo.put("accountName", ai.getAccountName());
     	accountInfo.put("accountID", ai.getUserId());
     	try {
-			EncryptionService encrypt = new EncryptionService(ai.getPassword().toCharArray());
-			byte[] pBytes = ai.getPassword().getBytes(StandardCharsets.UTF_8);
-			pBytes = encrypt.encrypt(pBytes);
-			accountInfo.put("accountPassword", pBytes);
+            char[] password = "123".toCharArray();
+            EncryptionService encryptionService = new EncryptionService(password);
+            byte[] accountPassword = encryptionService.encrypt(ai.getPassword().getBytes());
+            String encryptedPassword = Arrays.toString(accountPassword);
+            accountInfo.put("accountPassword", encryptedPassword);
 		} catch (CryptoException e) {
 			e.printStackTrace();
 		}
@@ -48,25 +49,44 @@ public class JSONDatabaseSerializer {
 		return data;
 	}
 	
-	public AccountInformation[] deserialize(JSONObject obj){
-		JSONObject[] jArr = (JSONObject[])obj.get("userAccounts");
-		AccountInformation[] ais = new AccountInformation[jArr.length];
-		for(int x = 0; x < jArr.length; x++){
-			ais[x].setAccountName(jArr[x].getString("accountName"));
-			ais[x].setUserId(jArr[x].getString("accountID"));
+	public static AccountInformation[] deserialize(JSONArray jArr){
+		AccountInformation[] ais = new AccountInformation[jArr.length()];
+
+		for(int x = 0; x < jArr.length(); x++){
+            JSONObject obj = (JSONObject) jArr.get(x);
+            AccountInformation accountInfo = new AccountInformation();
+			accountInfo.setAccountName(obj.optString("name", ""));
+			accountInfo.setUserId(obj.optString("userId", ""));
 			try {
-				EncryptionService encrypt = new EncryptionService(jArr[x].getString("accountPassword").toCharArray());
-				byte[] pBytes = jArr[x].getString("accountPassword").getBytes(StandardCharsets.UTF_8);
+                EncryptionService encrypt = new EncryptionService("123".toCharArray());
+                String encryptedPassword = obj.optString("password", "");
+                byte[] pBytes = getActualBytes(encryptedPassword);
 				byte[] pass = encrypt.decrypt(pBytes);
-				ais[x].setPassword(Arrays.toString(pass));
+				accountInfo.setPassword(Arrays.toString(pass));
 			} catch (CryptoException e) {
 				e.printStackTrace();
 			}
-			ais[x].setUrl(jArr[x].getString("accountURL"));
-			ais[x].setNotes(jArr[x].getString("accountNotes"));
+			accountInfo.setUrl(obj.optString("url", ""));
+			accountInfo.setNotes(obj.optString("notes", ""));
+            ais[x] = accountInfo;
 		}
 		
 		return ais;
 	}
-	
+
+    // parse out and get the real byte values!!
+    public static byte[] getActualBytes(String foo) {
+        String str = foo.substring(1, foo.lastIndexOf(']'));
+        String[] values = str.split(",");
+
+        byte[] actualBytes = new byte[values.length];
+        for (int j = 0; j < values.length; ++j) {
+            String s = values[j].replaceAll(" ", "");
+            Integer i = Integer.parseInt(s);
+            byte b = i.byteValue();
+            actualBytes[j] = b;
+        }
+        return actualBytes;
+    }
+
 }
