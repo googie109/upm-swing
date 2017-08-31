@@ -569,7 +569,12 @@ public class DatabaseActions {
     public void restoreFromCentralizedDatabase() {
         String url = Preferences.get(Preferences.DatabaseOptions.URL, "");
         String username = Preferences.get(Preferences.DatabaseOptions.USERNAME, "");
-        String password = JOptionPane.showInputDialog(mainWindow, "Enter your password to the centralized database");
+//        String password = JOptionPane.showInputDialog(mainWindow, "Enter your password to the centralized database");
+        String password = Preferences.password;
+
+        while (password == null || password.isEmpty()) {
+            password = Preferences.promptForPassword();
+        }
 
         JSONObject data = new JSONObject();
         data.put("username", username);

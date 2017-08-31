@@ -28,11 +28,13 @@ import java.io.IOException;
 import java.util.Properties;
 
 import javax.swing.JOptionPane;
+import javax.xml.crypto.Data;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com._17od.upm.platformspecific.PlatformSpecificCode;
+import org.json.JSONObject;
 
 
 /**
@@ -170,39 +172,20 @@ public class Preferences {
     	if(password == "" || password == null){
 	        password = JOptionPane.showInputDialog("Enter your password to the centralized database");
 	        if(password != null || password != ""){
-	        	try {
-	                Request.setGlobalDomain("http://localhost:8080/");
-	                Request.Get("")
-	                        .addRequestProperty("Authorization", "Private " + password)
-	                        .setData(password)
-	                        .sendAsync((err, res) -> {
-	                            String responseInfo = "";
-	                            // problem with request
-	                            if (err != null) {
-	                                responseInfo += err.getMessage() + "\n";
-	                            }
-	                            if (res != null) {
-	                                int responseCode = res.getCode();
-	                                switch (responseCode) {
-	                                    case 401:
-	                                        responseInfo += "Unauthorized! Invalid Credentials! \n";
-	                                        break;
-	                                    case 404:
-	                                        responseInfo += "Invalid Remote URL Location!\n";
-	                                        break;
-	                                    default:
-	                                        try {
-	                                            responseInfo += res.getResponseString() + "\n";
-	                                        } catch (IOException e) {
-	                                            responseInfo += e.getMessage() + "\n";
-	                                        }
-	                                }
-	                            }
-	                            JOptionPane.showMessageDialog(null, responseInfo, "INFO", JOptionPane.INFORMATION_MESSAGE);
-	                });
-	            } catch (IOException e) {
-	                JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
-	            }
+                JSONObject credentials = new JSONObject();
+                credentials.put("username", Preferences.get("username"));
+                credentials.put("password", password);
+                Request.setGlobalDomain(Preferences.get(DatabaseOptions.URL));
+                Request req = null;
+                try {
+                    req = Request.Post("validateCredentials").setData(credentials.toString()).send();
+                    Request.Response res = req.getResponse();
+
+                    // 200 -- we're authorized, otherwise something is wrong and invalid
+                    password = res.getCode() == 200 ? password : null;
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(null, "An error occurred: " + e.getMessage());
+                }
 	        }
     	}
         return password;
