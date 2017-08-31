@@ -70,10 +70,6 @@ public class EncryptionService {
     }
 
     private byte[] generateSalt() throws NoSuchAlgorithmException {
-//        SecureRandom saltGen = SecureRandom.getInstance(randomAlgorithm);
-//        byte pSalt[] = new byte[SALT_LENGTH];
-//        saltGen.nextBytes(pSalt);
-//        return pSalt;
         return new byte[] {0};
     }
 

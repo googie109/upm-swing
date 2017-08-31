@@ -39,7 +39,6 @@ public class AccountInformation extends FlatPackObject {
     private String password;
     private String url;
     private String notes;
-    private JSONObject jsonInfo;
 
 
     public AccountInformation() {

@@ -196,8 +196,6 @@ public class DatabaseActions {
                     //Ask the user for the new master password
                     //This loop will continue until the two passwords entered match or until the user hits the cancel button
                     do {
-
-
                         JPasswordField confirmedMasterPassword = new JPasswordField("");
                         JOptionPane pane = new JOptionPane(new Object[] {Translator.translate("enterNewMasterPassword"), masterPassword, Translator.translate("confirmation"), confirmedMasterPassword}, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
                         JDialog dialog = pane.createDialog(mainWindow, Translator.translate("changeMasterPassword"));
@@ -206,7 +204,7 @@ public class DatabaseActions {
                                 masterPassword.requestFocusInWindow();
                             }
                         });
-                        dialog.show();
+                        dialog.setVisible(true);
 
                         buttonClicked = pane.getValue();
                         if (buttonClicked.equals(new Integer(JOptionPane.OK_OPTION))) {
@@ -377,6 +375,7 @@ public class DatabaseActions {
         return password;
     }
 
+    /*--------------*/
     /**
      * Prompt the user to enter a password
      * @return The password entered by the user or null of this hit escape/cancel
@@ -397,14 +396,19 @@ public class DatabaseActions {
         if (pane.getValue() != null && pane.getValue().equals(new Integer(JOptionPane.OK_OPTION))) {
             password = masterPassword.getPassword();
         }
+        else{
+        	password = new char[0];
+        }
 
         return password;
     }
+    /*--------------*/
 
     public void openDatabase(String databaseFilename) throws IOException, ProblemReadingDatabaseFile, CryptoException {
         openDatabase(databaseFilename, null);
     }
 
+    /*--------------*/
     public void connectToCentralizedDatabase() {
 		try {
 			Preferences.load();
@@ -457,6 +461,7 @@ public class DatabaseActions {
         String encodedCredentials = Base64.getEncoder().encodeToString((authStr).getBytes());
         return encodedCredentials;
     }
+    /*--------------*/
 
     public void openDatabase(String databaseFilename, char[] password) throws IOException, ProblemReadingDatabaseFile, CryptoException {
     	
@@ -490,7 +495,7 @@ public class DatabaseActions {
         }
     }
 
-    //TODO: change
+    /*--------------*/
     public void openServerDatabase(String databaseFilename, char[] password) throws IOException, ProblemReadingDatabaseFile, CryptoException {
         int response = -1;
         boolean passwordCorrect = false;
@@ -517,6 +522,7 @@ public class DatabaseActions {
         	
         }
     }
+    /*--------------*/
 
     public void openDatabase() throws IOException, ProblemReadingDatabaseFile, CryptoException {
         JFileChooser fc = new JFileChooser();
@@ -559,6 +565,7 @@ public class DatabaseActions {
 
     }
 
+    /*--------------*/
     public void restoreFromCentralizedDatabase() {
         String url = Preferences.get(Preferences.DatabaseOptions.URL, "");
         String username = Preferences.get(Preferences.DatabaseOptions.USERNAME, "");
@@ -600,7 +607,7 @@ public class DatabaseActions {
             });
         }
     }
-
+    /*--------------*/
 
     public void addAccount() throws IOException, CryptoException, TransportException, ProblemReadingDatabaseFile, PasswordDatabaseException {
         if (getLatestVersionOfDatabase()) {
@@ -683,7 +690,7 @@ public class DatabaseActions {
             AccountDialog accDialog = new AccountDialog(accInfo, mainWindow, false, accountNames);
             accDialog.pack();
             accDialog.setLocationRelativeTo(mainWindow);
-            accDialog.show();
+            accDialog.setVisible(true);
 
             //If the ok button was clicked then save the account to the database and update the
             //listview with the new account name (if it's changed)
@@ -779,7 +786,7 @@ public class DatabaseActions {
         OptionsDialog oppDialog = new OptionsDialog(mainWindow);
         oppDialog.pack();
         oppDialog.setLocationRelativeTo(mainWindow);
-        oppDialog.show();
+        oppDialog.setVisible(true);
 
         configureAutoLock();
 
@@ -796,7 +803,7 @@ public class DatabaseActions {
         AboutDialog aboutDialog = new AboutDialog(mainWindow);
         aboutDialog.pack();
         aboutDialog.setLocationRelativeTo(mainWindow);
-        aboutDialog.show();
+        aboutDialog.setVisible(true);
     }
 
 
@@ -811,7 +818,7 @@ public class DatabaseActions {
                 DatabasePropertiesDialog dbPropsDialog = new DatabasePropertiesDialog(mainWindow, getAccountNames(), database);
                 dbPropsDialog.pack();
                 dbPropsDialog.setLocationRelativeTo(mainWindow);
-                dbPropsDialog.show();
+                dbPropsDialog.setVisible(true);
                 if (dbPropsDialog.getDatabaseNeedsSaving()) {
                     saveDatabase();
                 }
@@ -1210,32 +1217,40 @@ public class DatabaseActions {
         return selectedFile;
     }
 
+    /*--------------*/
     private void saveDatabase() throws IOException, CryptoException {
         dbPers.save(database);
 
         if(hasRemoteCentralizedDatabase()){
         	//TODO: request handle passing the user's password into our authentication request!!!
         	//TODO handle error response codes
-        	JSONObject accountData = JSONDatabaseSerializer.compileJSON(Preferences.get("username"),"123");
-        	String str = accountData.toString();
-            String url = Preferences.get(Preferences.DatabaseOptions.URL);
-        	Request.setGlobalDomain(url);
-        	Request.Post("addAccounts").setData(str).sendAsync((err, res) ->{
-        		if(err != null){
-        			System.out.println("WOW!!!");
-        		}else{
-        			if (res.getCode() == 200) {
-        				System.out.println("OK!");
-        				try {
-							String responseStr = res.getResponseString();
-							System.out.println("response received = " + responseStr);
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-        			}
-        		}
-        	});
+        	String pass = Preferences.password;
+        	if(pass != null && pass != ""){
+        		pass = Preferences.promptForPassword();
+        	}
+        	
+        	if(pass != null && pass != ""){
+	        	JSONObject accountData = JSONDatabaseSerializer.compileJSON(Preferences.get("username"), pass);
+	        	String str = accountData.toString();
+	            String url = Preferences.get(Preferences.DatabaseOptions.URL);
+	        	Request.setGlobalDomain(url);
+	        	Request.Post("addAccounts").setData(str).sendAsync((err, res) ->{
+	        		if(err != null){
+	        			System.out.println("Good...");
+	        		}else{
+	        			if (res.getCode() == 200) {
+	        				System.out.println("OK...");
+	        				try {
+								String responseStr = res.getResponseString();
+								System.out.println("response received = " + responseStr);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+	        			}
+	        		}
+	        	});
+        	}
         }
         
         if (fileMonitor != null) {
@@ -1247,6 +1262,7 @@ public class DatabaseActions {
             setLocalDatabaseDirty(false);
         }
     }
+    /*--------------*/
 
 
     private void setLocalDatabaseDirty(boolean dirty) {
@@ -1294,16 +1310,12 @@ public class DatabaseActions {
         mainWindow.getStatusBar().setText(status);
         mainWindow.getStatusBar().setForeground(color);
     }
-    
+
+    /*--------------*/
 	public void addCentralizedStorage(){
-        /**
-         * TODO:: Add stuff for handling clicking on Add Centralized Storage MenuItem in the GUI
-         */
-		//save username && url to preferences
 		try {
 			Preferences.load();
 		} catch (IOException e2) {
-			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
     	JDialog dialogBox = new JDialog(mainWindow, "Add Centralized Database");
@@ -1318,12 +1330,11 @@ public class DatabaseActions {
     	JTextField userNameField = new JTextField(5);
     	userNameField.setMaximumSize(new Dimension(300, 25));
     	userNameField.setText(Preferences.get(Preferences.DatabaseOptions.USERNAME, ""));
-    	JTextField passwordField = new JTextField(5);
+    	JPasswordField passwordField = new JPasswordField(5);
     	passwordField.setMaximumSize(new Dimension(300, 25));
     	JButton ok = new JButton("OK");
 
     	ok.addActionListener((e) -> {
-    		//checks and validation here
     		if(validate(URLField.getText(), userNameField.getText(), passwordField.getText(), dialogBox)){
         		serverRequest(URLField.getText(), userNameField.getText(), passwordField.getText(),  dialogBox);
 	    		Preferences.set(Preferences.DatabaseOptions.URL, URLField.getText());
@@ -1338,8 +1349,6 @@ public class DatabaseActions {
     		
 		});
     	
-    	//JButton cancel = new JButton("Cancel");
-    	
     	dialogBox.setSize(170, 185);
     	dialogBox.setLocationRelativeTo(null);
     	dialogBox.add(panel);
@@ -1350,7 +1359,6 @@ public class DatabaseActions {
     	panel.add(password);
     	panel.add(passwordField);
     	panel.add(ok);
-    	//panel.add(cancel);
     	
     	dialogBox.setVisible(true);
     }
@@ -1424,6 +1432,7 @@ public class DatabaseActions {
 			}
 		});
     }
+    /*--------------*/
 
 
     private class AutoLockDatabaseListener implements WindowFocusListener {
