@@ -572,8 +572,14 @@ public class DatabaseActions {
 //        String password = JOptionPane.showInputDialog(mainWindow, "Enter your password to the centralized database");
         String password = Preferences.password;
 
-        while (password == null || password.isEmpty()) {
+        int count = 0;
+        while (password == null || password.isEmpty() && count < 3) {
             password = Preferences.promptForPassword();
+            ++count; // prevent infinite dialogs
+        }
+        // stop if we failed
+        if (password == null) {
+            return;
         }
 
         JSONObject data = new JSONObject();
