@@ -28,7 +28,7 @@ public class JSONDatabaseSerializer {
 	
 	public static void addAccountInformation(AccountInformation ai){
 		String pass = Preferences.password;
-    	if(pass != null && pass != ""){
+    	if(pass == null || pass == ""){
     		pass = Preferences.promptForPassword();
     	}
     	
@@ -61,7 +61,7 @@ public class JSONDatabaseSerializer {
 	public static AccountInformation[] deserialize(JSONArray jArr){
 		AccountInformation[] ais = new AccountInformation[jArr.length()];
 		String password = Preferences.password;
-    	if(password != null && password != ""){
+    	if(password == null || password == ""){
     		password = Preferences.promptForPassword();
     	}
     	

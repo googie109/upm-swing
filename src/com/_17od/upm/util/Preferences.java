@@ -167,9 +167,7 @@ public class Preferences {
     }
 
     public static String promptForPassword(){
-    	if(password != ""){
-    		
-    		
+    	if(password == "" || password == null){
 	        password = JOptionPane.showInputDialog("Enter your password to the centralized database");
 	        if(password != null || password != ""){
 	        	try {

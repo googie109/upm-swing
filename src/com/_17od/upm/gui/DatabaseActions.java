@@ -1225,7 +1225,7 @@ public class DatabaseActions {
         	//TODO: request handle passing the user's password into our authentication request!!!
         	//TODO handle error response codes
         	String pass = Preferences.password;
-        	if(pass != null && pass != ""){
+        	if(pass == null || pass == ""){
         		pass = Preferences.promptForPassword();
         	}
         	
